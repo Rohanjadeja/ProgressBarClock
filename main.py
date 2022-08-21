@@ -8,11 +8,17 @@ ds = DS1302(Pin(0),Pin(1),Pin(2))
 
 ds.date_time() # returns the current datetime.
 
-#ds.date_time([2022, 8, 10, 3, 19, 10, 10]) # set datetime.
+#Uncomment line below to set time, recomment it after running once and save the code with recommented line
+#Format ds.date_time([Year,Month,Date,day(1-7),hr,m,s])
+#ds.date_time([2022, 8, 20, 6, 13, 27, 20])
 
 print(ds.date_time())
 
 
+#RGB Led disable for built-in status leds on tiny2040 board
+r = Pin(18, Pin.IN, Pin.PULL_UP)
+g = Pin(19, Pin.IN, Pin.PULL_UP)
+b = Pin(20, Pin.IN, Pin.PULL_UP)
 
 # Configure the number of WHITES2812 LEDs.
 NUM_LEDS = 24
@@ -56,39 +62,6 @@ def pixels_show():
 def pixels_set(i, color):
     ar[i] = (color[1]<<16) + (color[0]<<8) + color[2]
 
-def pixels_fill(color):
-    for i in range(len(ar)):
-        pixels_set(i, color)
-
-def color_chase(color, wait):
-    for i in range(NUM_LEDS):
-        pixels_set(i, color)
-        time.sleep(wait)
-        pixels_show()
-    time.sleep(0.2)
-
-def wheel(pos):
-    # Input a value 0 to 255 to get a color value.
-    # The colours are a transition r - g - b - back to r.
-    if pos < 0 or pos > 255:
-        return (0, 0, 0)
-    if pos < 85:
-        return (255 - pos * 3, pos * 3, 0)
-    if pos < 170:
-        pos -= 85
-        return (0, 255 - pos * 3, pos * 3)
-    pos -= 170
-    return (pos * 3, 0, 255 - pos * 3)
-
-
-def rainbow_cycle(wait):
-    for j in range(255):
-        for i in range(NUM_LEDS):
-            rc_index = (i * 256 // NUM_LEDS) + j
-            pixels_set(i, wheel(rc_index & 255))
-        pixels_show()
-        time.sleep(wait)
-
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 150, 0)
@@ -99,64 +72,12 @@ PURPLE = (113, 39, 230)
 WHITE = (255, 255, 255)
 ORANGE = (238, 186, 48)
 COLORS = (BLACK, RED, YELLOW, GREEN, CYAN, BLUE, PURPLE, WHITE)
-'''
-print("fills")
-for color in COLORS:
-    pixels_fill(color)
-    pixels_show()
-    time.sleep(0.2)
-
-print("chases")
-for color in COLORS:
-    color_chase(color, 0.01)
-
-print("rainbow")
-rainbow_cycle(0.1)
-'''
 
 while True:
-    (YELLOW,M,D,day,hr,m,s) = ds.date_time()
+    (YEAR,M,D,day,hr,m,s) = ds.date_time()
 
 # Night time color settings
-    if hr == 0:
-        brightness = 0.1
-        for a in range(11):
-            pixels_set(a, BLACK)
-            time.sleep(0.01)
-            pixels_show()
-            
-        if m == 0:
-            for b in range(12):
-                pixels_set(b+12, BLACK)
-                time.sleep(0.01)
-                pixels_show()
-    
-        if m > 0:
-            for b in range(int(m/5)):
-                pixels_set(b+12, PURPLE)
-                time.sleep(0.01)
-                pixels_show()
-    
-    if hr > 0 and hr <= 7:
-        brightness = 0.1
-        for a in range(hr):
-            pixels_set(a, BLUE)
-            time.sleep(0.01)
-            pixels_show()
-            
-        if m == 0:
-            for b in range(12):
-                pixels_set(b+12, BLACK)
-                time.sleep(0.01)
-                pixels_show()
-    
-        if m > 0:
-            for b in range(int(m/5)):
-                pixels_set(b+12, PURPLE)
-                time.sleep(0.01)
-                pixels_show()
-                
-    if hr > 19 and hr <=24:
+    if hr >= 17 and hr <=21:
         brightness = 0.1
         for a in range(hr-12):
             pixels_set(a, BLUE)
@@ -174,11 +95,68 @@ while True:
                 pixels_set(b+12, PURPLE)
                 time.sleep(0.01)
                 pixels_show()
-
 #End night time color
-                
-#Day time color settings
 
+#Sleep time color Start
+    if hr == 0:
+        brightness = 0.02
+        for a in range(11):
+            pixels_set(a, BLACK)
+            time.sleep(0.01)
+            pixels_show()
+            
+        if m == 0:
+            for b in range(12):
+                pixels_set(b+12, BLACK)
+                time.sleep(0.01)
+                pixels_show()
+    
+        if m > 0:
+            for b in range(int(m/5)):
+                pixels_set(b+12, PURPLE)
+                time.sleep(0.01)
+                pixels_show()
+                
+    if hr > 0 and hr <= 7:
+        brightness = 0.02
+        for a in range(hr):
+            pixels_set(a, BLUE)
+            time.sleep(0.01)
+            pixels_show()
+            
+        if m == 0:
+            for b in range(12):
+                pixels_set(b+12, BLACK)
+                time.sleep(0.01)
+                pixels_show()
+    
+        if m > 0:
+            for b in range(int(m/5)):
+                pixels_set(b+12, PURPLE)
+                time.sleep(0.01)
+                pixels_show()
+                
+    if hr > 21 and hr <= 24:
+        brightness = 0.02
+        for a in range(hr-12):
+            pixels_set(a, BLUE)
+            time.sleep(0.01)
+            pixels_show()
+            
+        if m == 0:
+            for b in range(12):
+                pixels_set(b+12, BLACK)
+                time.sleep(0.01)
+                pixels_show()
+    
+        if m > 0:
+            for b in range(int(m/5)):
+                pixels_set(b+12, PURPLE)
+                time.sleep(0.01)
+                pixels_show()
+#End sleep time settings
+         
+#Start Day time settings
     if hr > 7 and hr <= 12:
         brightness = 0.5
         for a in range(hr):
@@ -198,7 +176,25 @@ while True:
                 time.sleep(0.01)
                 pixels_show()
             
-    if hr > 12 and hr <=19:
+    if hr == 13 and m == 0 and s<10:
+        brightness = 0.5
+        for a in range(hr-1):
+            pixels_set(a, BLACK)
+            time.sleep(0.01)
+            pixels_show()
+            
+        for a in range(hr-12):
+            pixels_set(a, ORANGE)
+            time.sleep(0.01)
+            pixels_show()
+            
+        if m == 0:
+            for b in range(12):
+                pixels_set(b+12, BLACK)
+                time.sleep(0.01)
+                pixels_show()
+    
+    if hr >= 13 and hr <=17:
         brightness = 0.5
         for a in range(hr-12):
             pixels_set(a, ORANGE)
@@ -216,6 +212,6 @@ while True:
                 pixels_set(b+12, WHITE)
                 time.sleep(0.01)
                 pixels_show()
-            
+#End Day time settings
             
     time.sleep(10)
